@@ -1,0 +1,183 @@
+---
+title: "p8131-hw03"
+author: "Chris"
+date: "2026-03-01"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    number_sections: true
+    css: style.css
+---
+
+
+```{r message=FALSE}
+library(tidyverse)
+```
+
+
+# Problem One
+
+## Tidy the data
+
+```{r}
+df_one <- tibble(
+  age = c(25,25,35,35,45,45,55,55,65,65,75,75),
+  alcohol = c(0,1,0,1,0,1,0,1,0,1,0,1),
+  case = c(0,1,5,4,21,25,34,42,36,19,8,5),
+  control = c(106,9,164,26,138,29,139,27,88,18,31,0)
+)
+```
+
+
+## Question One
+
+```{r}
+model_binary <- glm(cbind(case, control) ~ alcohol + age,
+    family = binomial(link = "logit"),
+    data = df_one)
+
+summary(model_binary)
+```
+
+
+* After adjusting for age, people consuming ≥ 80g of alcohol daily have approximately 5.9 times higher odds of esophageal cancer compared to those consuming less.   
+* Age is also strongly associated with cancer risk; each 10-year increase in age nearly doubles the odds (OR = 1.85).   
+* Both predictors are highly statistically significant (p < 0.001).   
+* The likelihood ratio test comparing the fitted model to the null model is highly significant, indicating strong evidence that alcohol and age are associated with disease risk.  
+
+
+## Question Two
+
+We need `age` to be a factor, not a numeric vector.  
+
+```{r}
+model1_categorized <- glm(cbind(case, control) ~ factor(age) + alcohol,
+              family = binomial,
+              data = df_one)
+
+model0_categorized <- glm(cbind(case, control) ~ factor(age), 
+                          family = binomial(link = "logit"),
+                          data = df_one)
+
+anova(model0_categorized, model1_categorized, test = "Chisq")
+```
+
+After comparing the two nested models using a likelihood ratio test, we can get a deviance difference of 79.52 on 1 degree of freedom (p < 0.001). Therefore, we reject the null hypothesis that alcohol consumption is unrelated to esophageal cancer within age strata. There is strong evidence that alcohol consumption is associated with disease risk after adjusting for age group.  
+
+
+
+# Problem Two
+
+## Tidy the data
+
+```{r}
+df_two <- tibble(
+  seed = c(
+    rep("75", 11),
+    rep("73", 10)
+  ),
+  
+  extract = c(
+    rep("Bean", 5),
+    rep("Cucumber", 6),
+    
+    rep("Bean", 5),
+    rep("Cucumber", 5)
+  ),
+  
+  y = c(
+    10,23,23,26,17,
+    5,53,55,32,46,10,
+    
+    8,10,8,23,0,
+    3,22,15,32,3
+  ),
+  
+  m = c(
+    39,62,81,51,39,
+    6,74,72,51,79,13,
+    
+    16,30,28,45,4,
+    12,41,30,51,7
+  )
+)
+
+df_two$seed <- factor(df_two$seed)
+df_two$extract <- factor(df_two$extract)
+```
+
+
+## Question a
+
+```{r}
+model_full <- glm(cbind(y, m - y) ~ seed * extract,
+                  family = binomial(link = "logit"),
+                  data = df_two)
+summary(model_full)
+
+# model_main <- glm(cbind(y, m - y) ~ seed + extract,
+#                   family = binomial(link = "logit"),
+#                   data = df_two)
+# 
+# anova(model_main, model_full, test = "Chisq")
+```
+
+
+* Since p = 0.51, there is no significant difference between seed types under Bean extract.  
+
+* For seed 73, cucumber extract significantly increases germination odds compared to bean (OR = 1.72, p = 0.03).
+
+* The interaction term is significant (p = 0.011), indicating that the effect of cucumber extract differed between seed types.  
+
+* Moreover, cucumber increases the odds of germination by approximately 3.7 times for seed 75, a stronger effect than observed for seed 73.  
+
+
+## Question b
+
+```{r}
+model_q <- glm(cbind(y, m-y) ~ seed*extract,
+               family = quasibinomial,
+               data = df_two)
+summary(model_q)
+```
+
+* The coefficient estimates remain unchanged but the standard errors increase. As a result, the previously significant effects (extract and interaction) are no longer statistically significant at the 5% level.  
+* Therefore, the evidence for differences in germination rates between extracts and for interaction between seed type and extract is weaker than suggested by the standard binomial model.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
