@@ -1523,6 +1523,10 @@ border-radius: 0px;
     family = binomial(link = &quot;logit&quot;),
     data = df_one)
 
+# model_binary01 &lt;- glm(cbind(case, control) ~ alcohol * age,
+#     family = binomial(link = &quot;logit&quot;),
+#     data = df_one)
+
 summary(model_binary)</code></pre>
 <pre><code>## 
 ## Call:
@@ -1544,6 +1548,7 @@ summary(model_binary)</code></pre>
 ## AIC: 78.259
 ## 
 ## Number of Fisher Scoring iterations: 4</code></pre>
+<pre class="r"><code># summary(model_binary01)</code></pre>
 <ul>
 <li>After adjusting for age, people consuming ≥ 80g of alcohol daily
 have approximately 5.9 times higher odds of esophageal cancer compared

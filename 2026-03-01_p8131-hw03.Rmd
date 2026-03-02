@@ -38,7 +38,12 @@ model_binary <- glm(cbind(case, control) ~ alcohol + age,
     family = binomial(link = "logit"),
     data = df_one)
 
+# model_binary01 <- glm(cbind(case, control) ~ alcohol * age,
+#     family = binomial(link = "logit"),
+#     data = df_one)
+
 summary(model_binary)
+# summary(model_binary01)
 ```
 
 
